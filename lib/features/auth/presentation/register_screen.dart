@@ -1,23 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants.dart';
 import '../../../shared/widgets/custom_text_field.dart';
 import '../../../shared/widgets/custom_button.dart';
+import '../providers/auth_providers.dart';
 
-class RegisterScreen extends StatefulWidget {
+class RegisterScreen extends ConsumerStatefulWidget {
   final VoidCallback? onLogInTap;
 
   const RegisterScreen({super.key, this.onLogInTap});
 
   @override
-  State<RegisterScreen> createState() => _RegisterScreenState();
+  ConsumerState<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
+class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  bool _isLoading = false;
   bool _agreeToTerms = false;
 
   @override
@@ -28,7 +29,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
-  void _handleRegister() {
+  void _handleRegister() async {
     if (!_agreeToTerms) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -39,16 +40,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
     if (_formKey.currentState?.validate() ?? false) {
-      // Will be connected to auth provider later
-      setState(() => _isLoading = true);
-      Future.delayed(const Duration(seconds: 1), () {
-        if (mounted) setState(() => _isLoading = false);
-      });
+      final success = await ref
+          .read(authNotifierProvider.notifier)
+          .register(
+            name: _nameController.text.trim(),
+            email: _emailController.text.trim(),
+            password: _passwordController.text,
+          );
+      if (!success && mounted) {
+        final error = ref.read(authNotifierProvider).error;
+        if (error != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(error), backgroundColor: AppColors.expense),
+          );
+        }
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authNotifierProvider);
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -206,7 +218,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   CustomButton(
                     text: 'Sign Up',
                     onPressed: _handleRegister,
-                    isLoading: _isLoading,
+                    isLoading: authState.isLoading,
                   ),
 
                   const SizedBox(height: 24),

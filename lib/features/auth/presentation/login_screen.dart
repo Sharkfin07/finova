@@ -1,22 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants.dart';
 import '../../../shared/widgets/custom_text_field.dart';
 import '../../../shared/widgets/custom_button.dart';
+import '../providers/auth_providers.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   final VoidCallback? onSignUpTap;
 
   const LoginScreen({super.key, this.onSignUpTap});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -25,18 +26,28 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _handleLogin() {
+  void _handleLogin() async {
     if (_formKey.currentState?.validate() ?? false) {
-      // Will be connected to auth provider later
-      setState(() => _isLoading = true);
-      Future.delayed(const Duration(seconds: 1), () {
-        if (mounted) setState(() => _isLoading = false);
-      });
+      final success = await ref
+          .read(authNotifierProvider.notifier)
+          .signIn(
+            email: _emailController.text.trim(),
+            password: _passwordController.text,
+          );
+      if (!success && mounted) {
+        final error = ref.read(authNotifierProvider).error;
+        if (error != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(error), backgroundColor: AppColors.expense),
+          );
+        }
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authNotifierProvider);
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -157,7 +168,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   CustomButton(
                     text: 'Log In',
                     onPressed: _handleLogin,
-                    isLoading: _isLoading,
+                    isLoading: authState.isLoading,
                   ),
 
                   const SizedBox(height: 24),
