@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'features/auth/presentation/login_screen.dart';
+import 'features/auth/presentation/register_screen.dart';
 
 // Placeholder for dashboard - will be replaced later
 class HomePage extends StatelessWidget {
@@ -28,8 +29,9 @@ GoRouter createRouter() {
       ),
       GoRoute(
         path: '/register',
-        builder: (context, state) =>
-            const Scaffold(body: Center(child: Text('Register - coming soon'))),
+        builder: (context, state) => RegisterScreen(
+          onLogInTap: () => GoRouter.of(context).go('/login'),
+        ),
       ),
     ],
   );
