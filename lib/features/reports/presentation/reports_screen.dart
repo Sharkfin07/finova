@@ -51,9 +51,9 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
         .fold(0.0, (s, t) => s + t.amount);
 
     final currencyFormat = NumberFormat.currency(
-      locale: 'en_US',
-      symbol: '\$',
-      decimalDigits: 2,
+      locale: 'id_ID',
+      symbol: 'Rp ',
+      decimalDigits: 0,
     );
 
     // Financial health
