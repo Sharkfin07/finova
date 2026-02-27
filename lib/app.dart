@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'core/app_theme.dart';
 import 'routes.dart';
 
@@ -9,7 +8,7 @@ class App extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final router = createRouter();
+    final router = createRouter(ref);
 
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
