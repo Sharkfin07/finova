@@ -1,6 +1,5 @@
 // GENERATED-like code — manual Hive TypeAdapter for TransactionModel
-import 'package:hive/hive.dart';
-import 'transaction_model.dart';
+part of 'transaction_model.dart';
 
 class TransactionModelAdapter extends TypeAdapter<TransactionModel> {
   @override

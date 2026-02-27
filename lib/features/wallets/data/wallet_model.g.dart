@@ -1,6 +1,5 @@
 // GENERATED-like code — manual Hive TypeAdapter for WalletModel
-import 'package:hive/hive.dart';
-import 'wallet_model.dart';
+part of 'wallet_model.dart';
 
 class WalletModelAdapter extends TypeAdapter<WalletModel> {
   @override
