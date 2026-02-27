@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'features/auth/presentation/login_screen.dart';
 
-// Simple placeholder pages for initial routing
+// Placeholder for dashboard - will be replaced later
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
@@ -14,24 +15,22 @@ class HomePage extends StatelessWidget {
   }
 }
 
-class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Login')),
-      body: const Center(child: Text('Login placeholder')),
-    );
-  }
-}
-
 GoRouter createRouter() {
   return GoRouter(
-    initialLocation: '/',
+    initialLocation: '/login',
     routes: <RouteBase>[
       GoRoute(path: '/', builder: (context, state) => const HomePage()),
-      GoRoute(path: '/login', builder: (context, state) => const LoginPage()),
+      GoRoute(
+        path: '/login',
+        builder: (context, state) => LoginScreen(
+          onSignUpTap: () => GoRouter.of(context).go('/register'),
+        ),
+      ),
+      GoRoute(
+        path: '/register',
+        builder: (context, state) =>
+            const Scaffold(body: Center(child: Text('Register - coming soon'))),
+      ),
     ],
   );
 }
