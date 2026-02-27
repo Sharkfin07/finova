@@ -163,7 +163,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          currencyFormat.format(walletState.totalBalance),
+                          // Show total balance including income and expenses
+                          currencyFormat.format(
+                            walletState.totalBalance +
+                                (txState.totalIncome - txState.totalExpense),
+                          ),
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 32,
