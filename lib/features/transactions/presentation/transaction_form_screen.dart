@@ -132,7 +132,7 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
     }
 
     if (success && mounted) {
-      context.pop();
+      context.go('/');
     }
   }
 
@@ -171,7 +171,7 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
         .read(transactionNotifierProvider(user.uid).notifier)
         .deleteTransaction(widget.transaction!.id);
 
-    if (success && mounted) context.pop();
+    if (success && mounted) context.go('/');
   }
 
   @override

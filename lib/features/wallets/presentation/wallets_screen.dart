@@ -32,7 +32,7 @@ class _WalletsScreenState extends ConsumerState<WalletsScreen> {
       backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('My Wallets'),
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.transparent,
         foregroundColor: AppColors.textPrimary,
         elevation: 0,
         actions: [
@@ -117,7 +117,7 @@ class _WalletsScreenState extends ConsumerState<WalletsScreen> {
         ),
         const SizedBox(height: 24),
         const Text(
-          'All Wallets',
+          'My Accounts',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
@@ -270,13 +270,6 @@ class _TotalBalanceCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          Text(
-            '$walletCount wallet${walletCount != 1 ? 's' : ''}',
-            style: TextStyle(
-              color: Colors.white.withOpacity(0.6),
-              fontSize: 13,
-            ),
-          ),
         ],
       ),
     );
@@ -378,28 +371,6 @@ class _WalletCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 4),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  GestureDetector(
-                    onTap: onEdit,
-                    child: const Icon(
-                      Icons.edit_outlined,
-                      size: 18,
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  GestureDetector(
-                    onTap: onDelete,
-                    child: const Icon(
-                      Icons.delete_outline,
-                      size: 18,
-                      color: AppColors.expense,
-                    ),
-                  ),
-                ],
-              ),
             ],
           ),
         ],
