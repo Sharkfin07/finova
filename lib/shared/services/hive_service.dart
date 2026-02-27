@@ -1,8 +1,6 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import '../../features/transactions/data/transaction_model.dart';
-import '../../features/transactions/data/transaction_model.g.dart';
 import '../../features/wallets/data/wallet_model.dart';
-import '../../features/wallets/data/wallet_model.g.dart';
 
 class HiveService {
   static const String transactionsBox = 'transactions';

@@ -5,14 +5,26 @@ import '../../core/constants.dart';
 
 /// Shell widget with bottom navigation for the main app sections.
 class MainShell extends StatelessWidget {
-  final StatefulNavigationShell navigationShell;
+  final Widget child;
+  final String location;
 
-  const MainShell({super.key, required this.navigationShell});
+  const MainShell({super.key, required this.child, required this.location});
+
+  static int _indexOf(String location) {
+    if (location.startsWith('/reports')) return 1;
+    if (location.startsWith('/wallets')) return 2;
+    if (location.startsWith('/profile')) return 3;
+    return 0;
+  }
+
+  static const _paths = ['/', '/reports', '/wallets', '/profile'];
 
   @override
   Widget build(BuildContext context) {
+    final selectedIndex = _indexOf(location);
+
     return Scaffold(
-      body: navigationShell,
+      body: child,
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -28,14 +40,11 @@ class MainShell extends StatelessWidget {
           backgroundColor: Colors.white,
           elevation: 0,
           height: 64,
-          selectedIndex: navigationShell.currentIndex,
+          selectedIndex: selectedIndex,
           indicatorColor: AppColors.primary.withOpacity(0.12),
           labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
           onDestinationSelected: (index) {
-            navigationShell.goBranch(
-              index,
-              initialLocation: index == navigationShell.currentIndex,
-            );
+            context.go(_paths[index]);
           },
           destinations: const [
             NavigationDestination(
@@ -65,7 +74,7 @@ class MainShell extends StatelessWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => context.push('/transaction/add'),
+        onPressed: () => context.go('/transaction/add'),
         backgroundColor: AppColors.primary,
         child: const Icon(Icons.add, color: Colors.white),
       ),

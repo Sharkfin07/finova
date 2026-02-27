@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -29,42 +28,26 @@ GoRouter createRouter(WidgetRef ref) {
     },
     routes: <RouteBase>[
       // ── Bottom‑nav shell ──
-      StatefulShellRoute.indexedStack(
-        builder: (context, state, navigationShell) {
-          return MainShell(navigationShell: navigationShell);
+      ShellRoute(
+        builder: (context, state, child) {
+          return MainShell(child: child, location: state.location);
         },
-        branches: [
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/',
-                builder: (context, state) => const DashboardScreen(),
-              ),
-            ],
+        routes: [
+          GoRoute(
+            path: '/',
+            builder: (context, state) => const DashboardScreen(),
           ),
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/reports',
-                builder: (context, state) => const ReportsScreen(),
-              ),
-            ],
+          GoRoute(
+            path: '/reports',
+            builder: (context, state) => const ReportsScreen(),
           ),
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/wallets',
-                builder: (context, state) => const WalletsScreen(),
-              ),
-            ],
+          GoRoute(
+            path: '/wallets',
+            builder: (context, state) => const WalletsScreen(),
           ),
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/profile',
-                builder: (context, state) => const ProfileScreen(),
-              ),
-            ],
+          GoRoute(
+            path: '/profile',
+            builder: (context, state) => const ProfileScreen(),
           ),
         ],
       ),
