@@ -49,11 +49,14 @@ class WalletNotifier extends StateNotifier<WalletListState> {
 
   /// Load all wallets for the current user.
   Future<void> loadWallets() async {
+    if (!mounted) return;
     state = state.copyWith(isLoading: true, error: null);
     try {
       final wallets = await _repo.getWallets(_userId);
+      if (!mounted) return;
       state = state.copyWith(wallets: wallets, isLoading: false);
     } catch (e) {
+      if (!mounted) return;
       final cached = _repo.getCachedWallets(_userId);
       state = state.copyWith(
         wallets: cached,

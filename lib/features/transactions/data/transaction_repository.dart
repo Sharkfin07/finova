@@ -56,8 +56,8 @@ class TransactionRepository {
     try {
       final snapshot = await _userTransactions(userId)
           .orderBy('date', descending: true)
-          .get()
-          .timeout(const Duration(seconds: 10));
+          .get(const GetOptions(source: Source.server))
+          .timeout(const Duration(seconds: 5));
 
       final transactions = snapshot.docs
           .map((doc) => TransactionModel.fromMap(doc.data()))

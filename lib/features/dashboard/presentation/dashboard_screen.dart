@@ -16,22 +16,6 @@ class DashboardScreen extends ConsumerStatefulWidget {
 
 class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   @override
-  void initState() {
-    super.initState();
-    _loadData();
-  }
-
-  void _loadData() {
-    final user = ref.read(authStateProvider).valueOrNull;
-    if (user != null) {
-      ref
-          .read(transactionNotifierProvider(user.uid).notifier)
-          .loadTransactions();
-      ref.read(walletNotifierProvider(user.uid).notifier).loadWallets();
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
     final user = ref.watch(authStateProvider).valueOrNull;
     if (user == null) return const SizedBox.shrink();
@@ -49,7 +33,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       backgroundColor: AppColors.background,
       body: RefreshIndicator(
         color: AppColors.primary,
-        onRefresh: () async => _loadData(),
+        onRefresh: () async {
+          await Future.wait([
+            ref
+                .read(transactionNotifierProvider(user.uid).notifier)
+                .loadTransactions(),
+            ref.read(walletNotifierProvider(user.uid).notifier).loadWallets(),
+          ]);
+        },
         child: CustomScrollView(
           slivers: [
             // ── App Bar ──

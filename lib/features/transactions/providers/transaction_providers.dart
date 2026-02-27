@@ -58,11 +58,14 @@ class TransactionNotifier extends StateNotifier<TransactionListState> {
 
   /// Load all transactions for the current user.
   Future<void> loadTransactions() async {
+    if (!mounted) return;
     state = state.copyWith(isLoading: true, error: null);
     try {
       final transactions = await _repo.getTransactions(_userId);
+      if (!mounted) return;
       state = state.copyWith(transactions: transactions, isLoading: false);
     } catch (e) {
+      if (!mounted) return;
       // Use cached data on failure
       final cached = _repo.getCachedTransactions(_userId);
       state = state.copyWith(

@@ -16,19 +16,6 @@ class WalletsScreen extends ConsumerStatefulWidget {
 
 class _WalletsScreenState extends ConsumerState<WalletsScreen> {
   @override
-  void initState() {
-    super.initState();
-    _loadWallets();
-  }
-
-  void _loadWallets() {
-    final user = ref.read(authStateProvider).valueOrNull;
-    if (user != null) {
-      ref.read(walletNotifierProvider(user.uid).notifier).loadWallets();
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
     final user = ref.watch(authStateProvider).valueOrNull;
     if (user == null) return const SizedBox.shrink();
@@ -57,7 +44,9 @@ class _WalletsScreenState extends ConsumerState<WalletsScreen> {
       ),
       body: RefreshIndicator(
         color: AppColors.primary,
-        onRefresh: () async => _loadWallets(),
+        onRefresh: () async {
+          ref.read(walletNotifierProvider(user.uid).notifier).loadWallets();
+        },
         child: state.isLoading
             ? const Center(child: CircularProgressIndicator())
             : state.wallets.isEmpty

@@ -42,9 +42,9 @@ class WalletRepository {
 
   Future<List<WalletModel>> getWallets(String userId) async {
     try {
-      final snapshot = await _userWallets(
-        userId,
-      ).get().timeout(const Duration(seconds: 10));
+      final snapshot = await _userWallets(userId)
+          .get(const GetOptions(source: Source.server))
+          .timeout(const Duration(seconds: 5));
 
       final wallets = snapshot.docs
           .map((doc) => WalletModel.fromMap(doc.data()))
