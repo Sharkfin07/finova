@@ -9,6 +9,8 @@ import 'features/dashboard/presentation/dashboard_screen.dart';
 import 'features/reports/presentation/reports_screen.dart';
 import 'features/wallets/presentation/wallets_screen.dart';
 import 'features/profile/presentation/profile_screen.dart';
+import 'features/transactions/presentation/transaction_form_screen.dart';
+import 'features/transactions/data/transaction_model.dart';
 import 'shared/widgets/main_shell.dart';
 
 GoRouter createRouter(WidgetRef ref) {
@@ -78,6 +80,19 @@ GoRouter createRouter(WidgetRef ref) {
         path: '/register',
         builder: (context, state) =>
             RegisterScreen(onLogInTap: () => GoRouter.of(context).go('/login')),
+      ),
+
+      // ── Transaction routes ──
+      GoRoute(
+        path: '/transaction/add',
+        builder: (context, state) => const TransactionFormScreen(),
+      ),
+      GoRoute(
+        path: '/transaction/edit',
+        builder: (context, state) {
+          final tx = state.extra as TransactionModel;
+          return TransactionFormScreen(transaction: tx);
+        },
       ),
     ],
   );
