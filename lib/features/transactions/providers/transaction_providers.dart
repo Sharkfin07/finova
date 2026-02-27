@@ -52,7 +52,9 @@ class TransactionNotifier extends StateNotifier<TransactionListState> {
   final String _userId;
 
   TransactionNotifier(this._repo, this._userId)
-    : super(const TransactionListState());
+    : super(const TransactionListState()) {
+    Future.microtask(() => loadTransactions());
+  }
 
   /// Load all transactions for the current user.
   Future<void> loadTransactions() async {

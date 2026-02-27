@@ -43,7 +43,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(isLoading: true, error: null);
     try {
       await _repo.signIn(email: email, password: password);
-      state = state.copyWith(isLoading: false);
+      // Defer state update – Firebase auth change triggers GoRouter redirect
+      // in the same frame, so we must not modify state during that rebuild.
+      Future.microtask(() {
+        if (mounted) state = state.copyWith(isLoading: false);
+      });
       return true;
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
@@ -59,7 +63,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(isLoading: true, error: null);
     try {
       await _repo.register(name: name, email: email, password: password);
-      state = state.copyWith(isLoading: false);
+      Future.microtask(() {
+        if (mounted) state = state.copyWith(isLoading: false);
+      });
       return true;
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());

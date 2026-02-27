@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'app.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+import 'app.dart';
 import 'shared/services/hive_service.dart';
 
 Future<void> main() async {
@@ -11,11 +12,7 @@ Future<void> main() async {
   await HiveService.init();
 
   // Initialize Firebase
-  try {
-    await Firebase.initializeApp();
-  } catch (_) {
-    // Firebase not configured locally yet - continue without fatal error
-  }
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   runApp(const ProviderScope(child: App()));
 }

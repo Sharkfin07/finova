@@ -1,9 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'features/auth/presentation/login_screen.dart';
 import 'features/auth/presentation/register_screen.dart';
-import 'features/auth/providers/auth_providers.dart';
 import 'features/dashboard/presentation/dashboard_screen.dart';
 import 'features/reports/presentation/reports_screen.dart';
 import 'features/wallets/presentation/wallets_screen.dart';
@@ -12,13 +13,22 @@ import 'features/transactions/presentation/transaction_form_screen.dart';
 import 'features/transactions/data/transaction_model.dart';
 import 'shared/widgets/main_shell.dart';
 
-GoRouter createRouter(WidgetRef ref) {
-  final authState = ref.watch(authStateProvider);
+/// Listenable that notifies when Firebase auth state changes.
+class _AuthChangeNotifier extends ChangeNotifier {
+  _AuthChangeNotifier() {
+    FirebaseAuth.instance.authStateChanges().listen((_) => notifyListeners());
+  }
+}
 
+final _authChangeNotifier = _AuthChangeNotifier();
+
+/// Riverpod provider so the router is created once and stays stable.
+final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: '/login',
+    refreshListenable: _authChangeNotifier,
     redirect: (context, state) {
-      final isLoggedIn = authState.valueOrNull != null;
+      final isLoggedIn = FirebaseAuth.instance.currentUser != null;
       final isAuthRoute =
           state.location == '/login' || state.location == '/register';
 
@@ -79,4 +89,4 @@ GoRouter createRouter(WidgetRef ref) {
       ),
     ],
   );
-}
+});

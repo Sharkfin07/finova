@@ -43,7 +43,9 @@ class WalletNotifier extends StateNotifier<WalletListState> {
   final WalletRepository _repo;
   final String _userId;
 
-  WalletNotifier(this._repo, this._userId) : super(const WalletListState());
+  WalletNotifier(this._repo, this._userId) : super(const WalletListState()) {
+    Future.microtask(() => loadWallets());
+  }
 
   /// Load all wallets for the current user.
   Future<void> loadWallets() async {

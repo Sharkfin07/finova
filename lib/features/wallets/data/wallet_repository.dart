@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hive/hive.dart';
 
@@ -40,7 +42,9 @@ class WalletRepository {
 
   Future<List<WalletModel>> getWallets(String userId) async {
     try {
-      final snapshot = await _userWallets(userId).get();
+      final snapshot = await _userWallets(
+        userId,
+      ).get().timeout(const Duration(seconds: 10));
 
       final wallets = snapshot.docs
           .map((doc) => WalletModel.fromMap(doc.data()))

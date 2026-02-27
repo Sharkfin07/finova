@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hive/hive.dart';
 
@@ -52,9 +54,10 @@ class TransactionRepository {
 
   Future<List<TransactionModel>> getTransactions(String userId) async {
     try {
-      final snapshot = await _userTransactions(
-        userId,
-      ).orderBy('date', descending: true).get();
+      final snapshot = await _userTransactions(userId)
+          .orderBy('date', descending: true)
+          .get()
+          .timeout(const Duration(seconds: 10));
 
       final transactions = snapshot.docs
           .map((doc) => TransactionModel.fromMap(doc.data()))
