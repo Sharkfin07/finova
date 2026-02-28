@@ -100,7 +100,6 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
     if (user == null) return;
 
     final notifier = ref.read(transactionNotifierProvider(user.uid).notifier);
-
     final amount = double.parse(_amountController.text.replaceAll(',', ''));
 
     bool success;
@@ -170,7 +169,6 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
     final success = await ref
         .read(transactionNotifierProvider(user.uid).notifier)
         .deleteTransaction(widget.transaction!.id);
-
     if (success && mounted) context.go('/');
   }
 
@@ -201,187 +199,274 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
         child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
-            // ── Type Toggle ──
-            _TypeToggle(
-              value: _type,
-              onChanged: (val) => setState(() {
-                _type = val;
-                _category = null; // reset category on type change
-              }),
-            ),
-            const SizedBox(height: 24),
-
-            // ── Amount ──
-            _buildLabel('Amount'),
             const SizedBox(height: 8),
-            TextFormField(
-              controller: _amountController,
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              style: const TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
-              ),
-              decoration: InputDecoration(
-                prefixText: 'Rp  ',
-                prefixStyle: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary.withOpacity(0.5),
-                ),
-                hintText: '0',
-                filled: true,
-                fillColor: Colors.white,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: const BorderSide(color: AppColors.border),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: const BorderSide(color: AppColors.border),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: const BorderSide(
-                    color: AppColors.primary,
-                    width: 1.5,
-                  ),
-                ),
-              ),
-              validator: (val) {
-                if (val == null || val.isEmpty) return 'Enter an amount';
-                if (double.tryParse(val) == null || double.parse(val) <= 0) {
-                  return 'Enter a valid amount';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 20),
-
-            // ── Title ──
-            _buildLabel('Title'),
-            const SizedBox(height: 8),
-            _buildTextField(
-              controller: _titleController,
-              hint: 'e.g. Grocery shopping',
-              validator: (val) =>
-                  val == null || val.trim().isEmpty ? 'Enter a title' : null,
-            ),
-            const SizedBox(height: 20),
-
-            // ── Category ──
-            _buildLabel('Category'),
-            const SizedBox(height: 12),
-            _CategoryGrid(
-              categories: _categories,
-              selected: _category,
-              onSelected: (name) => setState(() => _category = name),
-            ),
-            const SizedBox(height: 20),
-
-            // ── Wallet ──
-            _buildLabel('Wallet'),
-            const SizedBox(height: 8),
-            if (walletState != null && walletState.wallets.isNotEmpty)
-              DropdownButtonFormField<String>(
-                value: _walletId,
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Colors.white,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(14),
-                    borderSide: const BorderSide(color: AppColors.border),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(14),
-                    borderSide: const BorderSide(color: AppColors.border),
-                  ),
-                ),
-                hint: const Text('Select wallet'),
-                items: walletState.wallets
-                    .map(
-                      (w) => DropdownMenuItem(value: w.id, child: Text(w.name)),
-                    )
-                    .toList(),
-                onChanged: (val) => setState(() => _walletId = val),
-              )
-            else
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: AppColors.border),
-                ),
-                child: const Text(
-                  'No wallets yet. Create one first.',
-                  style: TextStyle(color: AppColors.textSecondary),
-                ),
-              ),
-            const SizedBox(height: 20),
-
-            // ── Date ──
-            _buildLabel('Date'),
-            const SizedBox(height: 8),
-            GestureDetector(
-              onTap: _pickDate,
+            Center(
               child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 16,
-                ),
+                width: 40,
+                height: 4,
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: AppColors.border),
+                  color: AppColors.border,
+                  borderRadius: BorderRadius.circular(2),
                 ),
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.calendar_today,
-                      size: 20,
-                      color: AppColors.textSecondary,
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Switcher outside card
+            Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF3F5F6),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: _TypeToggle(
+                value: _type,
+                onChanged: (val) => setState(() {
+                  _type = val;
+                  _category = null;
+                }),
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
+            // Transaction Details card
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.03),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Transaction Details',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
                     ),
-                    const SizedBox(width: 12),
-                    Text(
-                      DateFormat('dd MMMM yyyy').format(_date),
-                      style: const TextStyle(
-                        fontSize: 15,
-                        color: AppColors.textPrimary,
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Category first
+                  _buildLabel('Category'),
+                  const SizedBox(height: 8),
+                  DropdownButtonFormField<String>(
+                    value: _category,
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: const Color(0xFFF3F5F6),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
                       ),
                     ),
-                  ],
-                ),
+                    hint: const Text('Select a category'),
+                    items: _categories
+                        .map(
+                          (c) => DropdownMenuItem(
+                            value: c.name,
+                            child: Row(
+                              children: [
+                                Icon(c.icon, size: 18, color: c.color),
+                                const SizedBox(width: 8),
+                                Text(c.name),
+                              ],
+                            ),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (val) => setState(() => _category = val),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // Title
+                  _buildLabel('Title'),
+                  const SizedBox(height: 8),
+                  _buildTextField(
+                    controller: _titleController,
+                    hint: 'e.g. Groceries, Rent',
+                    validator: (val) => val == null || val.trim().isEmpty
+                        ? 'Enter a title'
+                        : null,
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // Amount (compact)
+                  _buildLabel('Amount'),
+                  const SizedBox(height: 8),
+                  TextFormField(
+                    controller: _amountController,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: AppColors.textPrimary,
+                    ),
+                    decoration: InputDecoration(
+                      prefixText: 'Rp  ',
+                      prefixStyle: TextStyle(
+                        fontSize: 16,
+                        color: AppColors.textPrimary.withOpacity(0.6),
+                      ),
+                      hintText: '0',
+                      filled: true,
+                      fillColor: const Color(0xFFF3F5F6),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                    validator: (val) {
+                      if (val == null || val.isEmpty) return 'Enter an amount';
+                      if (double.tryParse(val) == null ||
+                          double.parse(val) <= 0)
+                        return 'Enter a valid amount';
+                      return null;
+                    },
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // Wallet
+                  _buildLabel('Wallet'),
+                  const SizedBox(height: 8),
+                  if (walletState != null && walletState.wallets.isNotEmpty)
+                    DropdownButtonFormField<String>(
+                      value: _walletId,
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: const Color(0xFFF3F5F6),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                      hint: const Text('Select wallet'),
+                      items: walletState.wallets
+                          .map(
+                            (w) => DropdownMenuItem(
+                              value: w.id,
+                              child: Text(w.name),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (val) => setState(() => _walletId = val),
+                    )
+                  else
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF3F5F6),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Text(
+                        'No wallets yet. Create one first.',
+                        style: TextStyle(color: AppColors.textSecondary),
+                      ),
+                    ),
+
+                  const SizedBox(height: 12),
+
+                  // Date
+                  _buildLabel('Date'),
+                  const SizedBox(height: 8),
+                  GestureDetector(
+                    onTap: _pickDate,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 14,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF3F5F6),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.calendar_today,
+                            size: 20,
+                            color: AppColors.textSecondary,
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            DateFormat('dd MMMM yyyy').format(_date),
+                            style: const TextStyle(
+                              fontSize: 15,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 20),
 
-            // ── Notes ──
-            _buildLabel('Notes (optional)'),
-            const SizedBox(height: 8),
-            _buildTextField(
-              controller: _notesController,
-              hint: 'Add a note…',
-              maxLines: 3,
+            const SizedBox(height: 16),
+
+            // Additional Information card
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.03),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildLabel('Additional Information'),
+                  const SizedBox(height: 8),
+                  _buildLabel('Notes (optional)'),
+                  const SizedBox(height: 8),
+                  _buildTextField(
+                    controller: _notesController,
+                    hint: 'Add a note…',
+                    maxLines: 3,
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(height: 32),
 
-            // ── Save Button ──
+            const SizedBox(height: 24),
+
+            // Save button
             SizedBox(
-              height: 54,
+              width: double.infinity,
+              height: 56,
               child: ElevatedButton(
                 onPressed: _save,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: BorderRadius.circular(28),
                   ),
                   elevation: 0,
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
                 ),
                 child: Text(
-                  _isEditing ? 'Update Transaction' : 'Add Transaction',
+                  _isEditing ? 'Update Transaction' : 'Save Transaction',
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -389,6 +474,7 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
                 ),
               ),
             ),
+
             const SizedBox(height: 24),
           ],
         ),
@@ -420,28 +506,25 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
       decoration: InputDecoration(
         hintText: hint,
         filled: true,
-        fillColor: Colors.white,
+        fillColor: const Color(0xFFF3F5F6),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppColors.border),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppColors.border),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
         ),
       ),
     );
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
 // Type Toggle
-// ─────────────────────────────────────────────────────────────────────────────
-
 class _TypeToggle extends StatelessWidget {
   final String value;
   final ValueChanged<String> onChanged;
@@ -453,9 +536,8 @@ class _TypeToggle extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.border),
+        color: const Color(0xFFF3F5F6),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         children: [
@@ -472,16 +554,16 @@ class _TypeToggle extends StatelessWidget {
       child: GestureDetector(
         onTap: () => onChanged(type),
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12),
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
           decoration: BoxDecoration(
-            color: selected ? color : Colors.transparent,
+            color: selected ? Colors.white : Colors.transparent,
             borderRadius: BorderRadius.circular(10),
           ),
           child: Center(
             child: Text(
               label,
               style: TextStyle(
-                color: selected ? Colors.white : AppColors.textSecondary,
+                color: selected ? AppColors.primary : AppColors.textSecondary,
                 fontWeight: FontWeight.w600,
                 fontSize: 15,
               ),
@@ -489,65 +571,6 @@ class _TypeToggle extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Category Grid
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _CategoryGrid extends StatelessWidget {
-  final List<TransactionCategory> categories;
-  final String? selected;
-  final ValueChanged<String> onSelected;
-
-  const _CategoryGrid({
-    required this.categories,
-    required this.selected,
-    required this.onSelected,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Wrap(
-      spacing: 10,
-      runSpacing: 10,
-      children: categories.map((cat) {
-        final isSelected = selected == cat.name;
-        return GestureDetector(
-          onTap: () => onSelected(cat.name),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            decoration: BoxDecoration(
-              color: isSelected ? cat.color : Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: isSelected ? cat.color : AppColors.border,
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  cat.icon,
-                  size: 18,
-                  color: isSelected ? Colors.white : cat.color,
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  cat.name,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                    color: isSelected ? Colors.white : AppColors.textPrimary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      }).toList(),
     );
   }
 }
